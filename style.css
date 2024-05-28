@@ -8,6 +8,10 @@
   display: none;
 }
 
+.show {
+  display: block;
+}
+
 canvas {
   display: block;
 }

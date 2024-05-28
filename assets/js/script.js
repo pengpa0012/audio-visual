@@ -1,5 +1,5 @@
 // display visuals on playing...
-let wave, playing, freq, amp, mic, recorder, button, fft
+let wave, playing, freq, amp, mic, recorder, button, input, fft, selectedSound
 
 function setup() {
   createCanvas(windowWidth, windowHeight)
@@ -9,12 +9,15 @@ function setup() {
   button.position(width / 2, height / 2)
   button.mousePressed(record)
 
+  input = createFileInput(uploadAudio)
+  input.position(width / 2 + button.width, height / 2)
+
   mic = new p5.AudioIn()
   mic.start()
   recorder = new p5.SoundRecorder()
   recorder.setInput(mic)
   soundFile = new p5.SoundFile()
-  fft = new p5.FFT()
+  fft = new p5.FFT(0.9, 1024)
 }
 
 function windowResized() {
@@ -41,6 +44,19 @@ function record() {
   }
 }
 
+function uploadAudio(file) {
+  if(file.type == "audio") {
+    selectedSound = loadSound(file.data, sound => {
+      sound.play()
+      input.class("hide")
+      button.class("hide")
+    })
+  } else {
+    input.elt.value = ""
+    alert("Wrong File Type")
+  }
+}
+
 function draw() {
   clear()
   button.position(width / 2, height / 2)
@@ -52,7 +68,13 @@ function draw() {
     let h = -height + map(spectrum[i], 0, 255, height, 0)
     rect(x, height, (width / spectrum.length) + 10, h)
   }
-  console.log(width / spectrum.length, width, spectrum.length)
+
+  if(selectedSound && !selectedSound.isPlaying()) {
+    input.class("show")
+    button.class("show")
+    input.elt.value = ""
+  }
+
   // if (playing) {
   //   wave.freq(freq, 0.1)
   //   wave.amp(amp, 0.1)
