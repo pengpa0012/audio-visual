@@ -1,4 +1,5 @@
-let wave, playing, freq, amp, mic, recorder, button
+// display visuals on playing...
+let wave, playing, freq, amp, mic, recorder, button, fft
 
 function setup() {
   createCanvas(windowWidth, windowHeight)
@@ -13,6 +14,7 @@ function setup() {
   recorder = new p5.SoundRecorder()
   recorder.setInput(mic)
   soundFile = new p5.SoundFile()
+  fft = new p5.FFT()
 }
 
 function windowResized() {
@@ -20,7 +22,6 @@ function windowResized() {
 }
 
 function record() {
-  console.log(button.elt)
   if(button.class() == "record") {
     recorder.record(soundFile)
     button.html("stop")
@@ -40,12 +41,23 @@ function record() {
   }
 }
 
-// function draw() {
+function draw() {
+  clear()
+  button.position(width / 2, height / 2)
+  let spectrum = fft.analyze()
+  noStroke()
+  fill(0)
+  for (let i = 0; i < spectrum.length; i++){
+    let x = map(i * 10, 0, spectrum.length, 0, width)
+    let h = -height + map(spectrum[i], 0, 255, height, 0)
+    rect(x, height, (width / spectrum.length) + 10, h)
+  }
+  console.log(width / spectrum.length, width, spectrum.length)
   // if (playing) {
   //   wave.freq(freq, 0.1)
   //   wave.amp(amp, 0.1)
   // }
-// }
+}
 
 // function mousePressed() {
 //   playing = playing ? false : true
